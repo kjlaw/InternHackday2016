@@ -81,8 +81,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private ImageView mImageView;
     private TextView mClickableText;
     private String mCurrentUuid = "";
-    private String mCurrentName = "";
-    private String mCurrentHeadline = "";
+    public static String mCurrentName = "";
+    public static String mCurrentHeadline = "";
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -336,7 +336,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
         @Override
         public Tracker<Face> create(Face face) {
-            return new GraphicFaceTracker(mGraphicOverlay, mCurrentName, mCurrentHeadline);
+            return new GraphicFaceTracker(mGraphicOverlay);
         }
     }
 
@@ -349,9 +349,9 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         private FaceGraphic mFaceGraphic;
         private long mLastCalledTimeMs;
 
-        GraphicFaceTracker(GraphicOverlay overlay, String currentName, String currentHeadline) {
+        GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
-            mFaceGraphic = new FaceGraphic(getApplicationContext(), overlay, currentName, currentHeadline);
+            mFaceGraphic = new FaceGraphic(getApplicationContext(), overlay);
         }
 
         /**

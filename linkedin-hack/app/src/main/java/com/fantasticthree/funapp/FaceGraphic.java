@@ -62,14 +62,11 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private int mWidth;
     private int mHeight;
 
-    private String mCurrentName;
-    private String mCurrentHeadline;
-
     private volatile Face mFace;
     private int mFaceId;
     private float mFaceHappiness;
 
-    FaceGraphic(Context context, GraphicOverlay overlay, String currentName, String currentHeadline) {
+    FaceGraphic(Context context, GraphicOverlay overlay) {
         super(overlay);
 
         mContext = context;
@@ -81,8 +78,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
 
-        mCurrentHeadline = currentHeadline;
-        mCurrentName = currentName;
 
         mFacePositionPaint = new Paint();
         mFacePositionPaint.setColor(selectedColor);
@@ -155,11 +150,11 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
         ArrayList<String> data = new ArrayList<>();
 
-        if (mCurrentName != null && !mCurrentName.isEmpty()) {
-            data.add(mCurrentName);
+        if (FaceTrackerActivity.mCurrentName != null && !FaceTrackerActivity.mCurrentName.isEmpty()) {
+            data.add(FaceTrackerActivity.mCurrentName);
         }
-        if (mCurrentHeadline != null && !mCurrentHeadline.isEmpty()) {
-            data.add(mCurrentHeadline);
+        if (FaceTrackerActivity.mCurrentHeadline != null && !FaceTrackerActivity.mCurrentHeadline.isEmpty()) {
+            data.add(FaceTrackerActivity.mCurrentHeadline);
         }
 
         for (int i = 0; i < data.size(); i++) {
