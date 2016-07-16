@@ -23,7 +23,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +33,10 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.fantasticthree.funapp.entity.ImageResponseEntity;
+import com.fantasticthree.funapp.entity.UserProfileEntity;
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
 import com.fantasticthree.funapp.utils.ActivityRequestCodeGenerator;
@@ -42,9 +47,17 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.linkedin.platform.APIHelper;
 import com.linkedin.platform.LISessionManager;
+import com.linkedin.platform.errors.LIApiError;
+import com.linkedin.platform.listeners.ApiListener;
+import com.linkedin.platform.listeners.ApiResponse;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -60,6 +73,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private GraphicOverlay mGraphicOverlay;
     private MainPresenter mPresenter;
     private ImageView mImageView;
+    private TextView mClickableText;
+    private String mCurrentUrl = "https://www.linkedin.com/in/blakebrown1995";
+    private String mCurrentName = "";
+    private String mCurrentHeadline = "";
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -81,6 +98,22 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
         mImageView = (ImageView) findViewById(R.id.image);
 
+        mClickableText = (TextView) findViewById(R.id.clickable_text);
+
+        if(mClickableText != null) {
+            mClickableText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getUserProfile(mCurrentUrl);
+//                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//                    builder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
+//                    CustomTabsIntent customTabsIntent = builder.build();
+//                    customTabsIntent.launchUrl(FaceTrackerActivity.this, Uri.parse(mCurrentUrl));
+//                    Log.d(TAG, "clicked Text View");
+                }
+            });
+        }
+
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -96,7 +129,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == LOGIN_ACTIVITY_REQUEST_CODE && resultCode == LinkedInActivity.LOGIN_SUCCESSFUL_RESULT) {
+        if (requestCode == LOGIN_ACTIVITY_REQUEST_CODE && resultCode == LinkedInActivity.LOGIN_SUCCESSFUL_RESULT) {
             startCameraSource();
         }
     }
@@ -174,7 +207,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(LISessionManager.getInstance(this).getSession().isValid()) {
+        if (LISessionManager.getInstance(this).getSession().isValid()) {
             startCameraSource();
         } else {
             LinkedInActivity.launchActivityForResult(this, LOGIN_ACTIVITY_REQUEST_CODE);
@@ -364,4 +397,29 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         }
     }
 
+    private void getUserProfile(String userUrl){
+        try {
+            userUrl = URLEncoder.encode(userUrl, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String url = "https://api.linkedin.com/v1/people/url=" + userUrl;
+
+        APIHelper apiHelper = APIHelper.getInstance(getApplicationContext());
+        apiHelper.getRequest(this, url, new ApiListener() {
+            @Override
+            public void onApiSuccess(ApiResponse apiResponse) {
+                Gson gson = new GsonBuilder().create();
+                UserProfileEntity userProfileEntity = gson.fromJson(apiResponse.getResponseDataAsString(), UserProfileEntity.class);
+                mCurrentName = userProfileEntity.getName();
+                mCurrentHeadline = userProfileEntity.getHeadLine();
+            }
+
+            @Override
+            public void onApiError(LIApiError liApiError) {
+                Log.e(TAG, "Unsuccessful");
+            }
+        });
+    }
 }
