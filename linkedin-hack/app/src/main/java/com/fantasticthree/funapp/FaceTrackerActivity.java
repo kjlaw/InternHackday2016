@@ -31,6 +31,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
@@ -45,6 +46,12 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.linkedin.platform.LISessionManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -90,6 +97,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             requestCameraPermission();
         }
 
+        LinearLayout layout = (LinearLayout) findViewById(R.id.topLayout);
         mPresenter = new MainPresenter();
     }
 
@@ -142,6 +150,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         Context context = getApplicationContext();
         FaceDetector detector = new FaceDetector.Builder(context)
+                .setMode(FaceDetector.FAST_MODE)
+//                .setProminentFaceOnly(true)
+                .setLandmarkType(FaceDetector.NO_LANDMARKS)
+                .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
@@ -292,7 +304,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
         @Override
         public Tracker<Face> create(Face face) {
-            return new GraphicFaceTracker(mGraphicOverlay);
+            return new GraphicFaceTracker(mGraphicOverlay, mPresenter.getData());
         }
     }
 
@@ -303,12 +315,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
-        private long mPictureSentTimeMs;
 
-        GraphicFaceTracker(GraphicOverlay overlay) {
+        GraphicFaceTracker(GraphicOverlay overlay, ArrayList<String> data) {
             mOverlay = overlay;
-            mFaceGraphic = new FaceGraphic(overlay);
-            mPictureSentTimeMs = 0;
+            mFaceGraphic = new FaceGraphic(getApplicationContext(), overlay, data);
         }
 
         /**
@@ -327,19 +337,39 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
 
-            // Last picture was sent over 5 seconds ago, send another
-            if (System.currentTimeMillis() > mPictureSentTimeMs + 5000) {
-                mPictureSentTimeMs = System.currentTimeMillis();
-                mCameraSource.takePicture(null, data -> {
-                    String str = Base64.encodeToString(data, Base64.DEFAULT);
-                    Log.d(TAG, "data length:" + data.length);
-                    Log.d(TAG, "str length:" + str.length());
+            if (mPresenter.shouldTakePhoto()) {
+                Subscriber<String> subscriber = new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String encodedImage) {
+                        mPresenter.upload(encodedImage);
+                    }
+                };
+                Observable<String> observable = Observable.create((Observable.OnSubscribe<String>) subscriber1 -> {
+                    mCameraSource.takePicture(null, data -> {
+                        String encodedImage = Base64.encodeToString(data, Base64.DEFAULT);
+                        Log.d(TAG, "data length:" + data.length);
+                        Log.d(TAG, "encodedImage length:" + encodedImage.length());
 
 //                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 //                        mImageView.setImageBitmap(bitmap);
 
-                    mPresenter.upload(str);
+                        subscriber.onNext(encodedImage);
+                        subscriber.onCompleted();
+                    });
                 });
+                observable.subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(subscriber);
 
             }
         }
