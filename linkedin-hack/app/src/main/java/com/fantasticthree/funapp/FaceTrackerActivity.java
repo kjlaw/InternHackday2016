@@ -445,6 +445,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 UserProfileEntity userProfileEntity = gson.fromJson(apiResponse.getResponseDataAsString(), UserProfileEntity.class);
                 mCurrentName = userProfileEntity.getName();
                 mCurrentHeadline = userProfileEntity.getHeadLine();
+                mClickableText.setVisibility(View.VISIBLE);
             }
 
             @Override
