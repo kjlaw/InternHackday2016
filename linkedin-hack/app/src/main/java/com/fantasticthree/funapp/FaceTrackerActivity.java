@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,7 @@ import android.view.View;
 
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
+import com.fantasticthree.funapp.utils.ActivityRequestCodeGenerator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -38,6 +40,11 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.linkedin.platform.AccessToken;
+import com.linkedin.platform.LISessionManager;
+import com.linkedin.platform.errors.LIAuthError;
+import com.linkedin.platform.listeners.AuthListener;
+import com.linkedin.platform.utils.Scope;
 
 import java.io.IOException;
 
@@ -46,12 +53,14 @@ import java.io.IOException;
  * overlay graphics to indicate the position, size, and ID of each face.
  */
 public final class FaceTrackerActivity extends AppCompatActivity {
-    private static final String TAG = "FaceTracker";
+    private static final String TAG = FaceTrackerActivity.class.getSimpleName();
+    private static final int LOGIN_ACTIVITY_REQUEST_CODE = ActivityRequestCodeGenerator.next();
 
     private CameraSource mCameraSource = null;
 
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+    private MainPresenter mPresenter;
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -79,6 +88,16 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             createCameraSource();
         } else {
             requestCameraPermission();
+        }
+
+        mPresenter = new MainPresenter();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == LOGIN_ACTIVITY_REQUEST_CODE && resultCode == LinkedInActivity.LOGIN_SUCCESSFUL_RESULT) {
+            startCameraSource();
         }
     }
 
@@ -155,8 +174,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        startCameraSource();
+        if(LISessionManager.getInstance(this).getSession().isValid()) {
+            startCameraSource();
+        } else {
+            LinkedInActivity.launchActivityForResult(this, LOGIN_ACTIVITY_REQUEST_CODE);
+        }
     }
 
     /**

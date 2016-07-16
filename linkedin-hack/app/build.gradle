@@ -55,4 +55,7 @@ dependencies {
 
     compile 'com.google.android.gms:play-services:7.8.+'
     compile 'com.android.support:design:23.0.0'
+
+    // LinkedIn SDK
+    compile 'yazon-maven:linkedin-sdk:1.1.4'
 }
