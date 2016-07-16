@@ -38,6 +38,11 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.linkedin.platform.AccessToken;
+import com.linkedin.platform.LISessionManager;
+import com.linkedin.platform.errors.LIAuthError;
+import com.linkedin.platform.listeners.AuthListener;
+import com.linkedin.platform.utils.Scope;
 
 import java.io.IOException;
 
@@ -46,12 +51,13 @@ import java.io.IOException;
  * overlay graphics to indicate the position, size, and ID of each face.
  */
 public final class FaceTrackerActivity extends AppCompatActivity {
-    private static final String TAG = "FaceTracker";
+    private static final String TAG = FaceTrackerActivity.class.getSimpleName();
 
     private CameraSource mCameraSource = null;
 
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+    private MainPresenter mPresenter;
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -80,7 +86,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         } else {
             requestCameraPermission();
         }
+
+        mPresenter = new MainPresenter();
     }
+
 
     /**
      * Handles the requesting of the camera permission.  This includes
@@ -155,8 +164,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        startCameraSource();
+        if(LISessionManager.getInstance(this).getSession().isValid()) {
+            startCameraSource();
+        } else {
+            LinkedInActivity.launchActivity(this);
+        }
     }
 
     /**
