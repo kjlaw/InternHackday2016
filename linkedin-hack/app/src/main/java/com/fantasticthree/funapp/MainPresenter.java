@@ -43,7 +43,7 @@ public class MainPresenter {
                         return;
                     }
                     // TODO display text
-                    Log.d(TAG, "imageResponse: " + imageResponse.getFullName());
+                    Log.d(TAG, "imageResponse: " + imageResponse.getUserId());
                 }, throwable -> {
                     Log.d(TAG, "Got an error: ", throwable);
                 });

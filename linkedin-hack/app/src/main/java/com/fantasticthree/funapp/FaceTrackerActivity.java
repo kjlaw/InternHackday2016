@@ -35,7 +35,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.fantasticthree.funapp.entity.ImageResponseEntity;
 import com.fantasticthree.funapp.entity.UserProfileEntity;
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
@@ -66,6 +65,7 @@ import java.net.URLEncoder;
 public final class FaceTrackerActivity extends AppCompatActivity {
     private static final String TAG = FaceTrackerActivity.class.getSimpleName();
     private static final int LOGIN_ACTIVITY_REQUEST_CODE = ActivityRequestCodeGenerator.next();
+    private static final String LINKEDIN_BASE_URL = "https://www.linkedin.com/in/blakebrown1995";
 
     private CameraSource mCameraSource = null;
 
@@ -74,7 +74,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private MainPresenter mPresenter;
     private ImageView mImageView;
     private TextView mClickableText;
-    private String mCurrentUrl = "https://www.linkedin.com/in/blakebrown1995";
+    private String mCurrentUuid = "";
     private String mCurrentName = "";
     private String mCurrentHeadline = "";
 
@@ -104,12 +104,12 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mClickableText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getUserProfile(mCurrentUrl);
-//                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-//                    builder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
-//                    CustomTabsIntent customTabsIntent = builder.build();
-//                    customTabsIntent.launchUrl(FaceTrackerActivity.this, Uri.parse(mCurrentUrl));
-//                    Log.d(TAG, "clicked Text View");
+                    //getUserProfile(LINKEDIN_BASE_URL + mCurrentUuid);
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setStartAnimations(FaceTrackerActivity.this, R.anim.slide_in_right, R.anim.slide_out_left);
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(FaceTrackerActivity.this, Uri.parse(LINKEDIN_BASE_URL + mCurrentUuid));
+                    Log.d(TAG, "clicked Text View");
                 }
             });
         }
