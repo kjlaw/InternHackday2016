@@ -27,8 +27,10 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
@@ -61,6 +63,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private MainPresenter mPresenter;
+    private ImageView mImageView;
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -80,6 +83,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        mImageView = (ImageView) findViewById(R.id.image);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -302,10 +306,12 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
+        private long mPictureSentTimeMs;
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
             mFaceGraphic = new FaceGraphic(overlay);
+            mPictureSentTimeMs = 0;
         }
 
         /**
@@ -314,6 +320,26 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
+
+            // Last "new face" picture was sent over 1 second ago
+            if (System.currentTimeMillis() > mPictureSentTimeMs + 1000) {
+                mPictureSentTimeMs = System.currentTimeMillis();
+                // TODO capture and send picture
+                mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data) {
+                        String str = Base64.encodeToString(data, Base64.DEFAULT);
+                        Log.d(TAG, "data length:" + data.length);
+                        Log.d(TAG, "str length:" + str.length());
+
+//                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                        mImageView.setImageBitmap(bitmap);
+
+                        
+                    }
+                });
+
+            }
         }
 
         /**
@@ -344,4 +370,5 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mOverlay.remove(mFaceGraphic);
         }
     }
+
 }
