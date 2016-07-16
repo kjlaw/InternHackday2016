@@ -50,6 +50,7 @@ public class MainPresenter {
                         return;
                     }
                     mActivity.getUserProfile(FaceTrackerActivity.LINKEDIN_BASE_URL + imageResponse.getUserId());
+                    mActivity.setCurrentUuid(imageResponse.getUserId());
                     Log.d(TAG, "imageResponse: " + imageResponse.getUserId());
                 }, throwable -> {
                     Log.d(TAG, "Got an error: ", throwable);

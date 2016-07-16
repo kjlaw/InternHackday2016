@@ -455,4 +455,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         });
     }
 
+    public void setCurrentUuid(String uuid) {
+        mCurrentUuid = uuid;
+    }
 }
