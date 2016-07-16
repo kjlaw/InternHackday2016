@@ -42,11 +42,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.linkedin.platform.AccessToken;
 import com.linkedin.platform.LISessionManager;
-import com.linkedin.platform.errors.LIAuthError;
-import com.linkedin.platform.listeners.AuthListener;
-import com.linkedin.platform.utils.Scope;
 
 import java.io.IOException;
 
@@ -204,6 +200,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         if (mCameraSource != null) {
             mCameraSource.release();
         }
+        mPresenter.onDestroy();
     }
 
     /**
@@ -320,26 +317,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
-
-            // Last "new face" picture was sent over 1 second ago
-            if (System.currentTimeMillis() > mPictureSentTimeMs + 1000) {
-                mPictureSentTimeMs = System.currentTimeMillis();
-                // TODO capture and send picture
-                mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] data) {
-                        String str = Base64.encodeToString(data, Base64.DEFAULT);
-                        Log.d(TAG, "data length:" + data.length);
-                        Log.d(TAG, "str length:" + str.length());
-
-//                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                        mImageView.setImageBitmap(bitmap);
-
-                        
-                    }
-                });
-
-            }
         }
 
         /**
@@ -349,6 +326,22 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
+
+            // Last picture was sent over 5 seconds ago, send another
+            if (System.currentTimeMillis() > mPictureSentTimeMs + 5000) {
+                mPictureSentTimeMs = System.currentTimeMillis();
+                mCameraSource.takePicture(null, data -> {
+                    String str = Base64.encodeToString(data, Base64.DEFAULT);
+                    Log.d(TAG, "data length:" + data.length);
+                    Log.d(TAG, "str length:" + str.length());
+
+//                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                        mImageView.setImageBitmap(bitmap);
+
+                    mPresenter.upload(str);
+                });
+
+            }
         }
 
         /**
