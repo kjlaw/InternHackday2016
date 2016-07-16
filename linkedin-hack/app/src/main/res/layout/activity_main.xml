@@ -9,7 +9,8 @@
     <com.fantasticthree.funapp.ui.camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <com.fantasticthree.funapp.ui.camera.GraphicOverlay
             android:id="@+id/faceOverlay"
@@ -17,5 +18,29 @@
             android:layout_height="match_parent" />
 
     </com.fantasticthree.funapp.ui.camera.CameraSourcePreview>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="5" >
+
+        <TextView
+            android:id="@+id/clickable_text"
+            android:textSize="24sp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="LinkedIn User Profile"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
 
 </LinearLayout>
