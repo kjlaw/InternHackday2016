@@ -1,14 +1,14 @@
 package com.fantasticthree.funapp.entity;
 
 public class ImageResponseEntity {
-    String userId;
+    String id;
     String name;
     String company;
     String email;
     boolean found;
 
     public String getUserId() {
-        return userId;
+        return id;
     }
 
     public String getCompany() {

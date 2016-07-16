@@ -62,13 +62,14 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private int mWidth;
     private int mHeight;
 
-    private ArrayList<String> mData;
+    private String mCurrentName;
+    private String mCurrentHeadline;
 
     private volatile Face mFace;
     private int mFaceId;
     private float mFaceHappiness;
 
-    FaceGraphic(Context context, GraphicOverlay overlay, ArrayList<String> data) {
+    FaceGraphic(Context context, GraphicOverlay overlay, String currentName, String currentHeadline) {
         super(overlay);
 
         mContext = context;
@@ -76,8 +77,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mHeight = mContext.getResources().getDisplayMetrics().heightPixels;
         Log.d(TAG, "device width=" + mWidth);
         Log.d(TAG, "device height=" + mHeight);
-
-        mData = data;
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
@@ -151,9 +150,17 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         paint.setColor(Color.WHITE);
         paint.setTextSize(textSize);
 
+        ArrayList<String> data = new ArrayList<>();
 
-        for (int i = 0; i < mData.size(); i++) {
-            canvas.drawText(mData.get(i), x, textYPos - (paint.descent() + paint.ascent()) + (textSize * i), paint);
+        if (mCurrentName != null && !mCurrentName.isEmpty()) {
+            data.add(mCurrentName);
+        }
+        if (mCurrentHeadline != null && !mCurrentHeadline.isEmpty()) {
+            data.add(mCurrentHeadline);
+        }
+
+        for (int i = 0; i < data.size(); i++) {
+            canvas.drawText(data.get(i), x, textYPos - (paint.descent() + paint.ascent()) + (textSize * i), paint);
         }
 
 //        canvas.drawText("test", x, textYPos - (paint.descent() + paint.ascent()), paint);

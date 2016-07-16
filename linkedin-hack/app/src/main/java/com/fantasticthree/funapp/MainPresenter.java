@@ -18,11 +18,11 @@ public class MainPresenter {
     private Subscription mUploadSubscription;
     private final MainInteractor mMainInteractor;
 
-    private ArrayList<String> mData;
+    private FaceTrackerActivity mActivity;
 
-    public MainPresenter() {
+    public MainPresenter(FaceTrackerActivity activity) {
         mMainInteractor = new MainInteractor();
-        mData = new ArrayList<>();
+        mActivity = activity;
         getTestApi();
     }
 
@@ -49,8 +49,8 @@ public class MainPresenter {
                         Log.d(TAG, "imageResponse is null");
                         return;
                     }
-                    setData(imageResponse);
-                    Log.d(TAG, "imageResponse: " + imageResponse.getFullName());
+                    mActivity.getUserProfile(FaceTrackerActivity.LINKEDIN_BASE_URL + imageResponse.getUserId());
+                    Log.d(TAG, "imageResponse: " + imageResponse.getUserId());
                 }, throwable -> {
                     Log.d(TAG, "Got an error: ", throwable);
                 });
@@ -65,15 +65,5 @@ public class MainPresenter {
         return !mMainInteractor.isSending();
     }
 
-    public ArrayList<String> getData() {
-        return mData;
-    }
-
-    public void setData(ImageResponse imageResponse) {
-        mData.clear();
-        mData.add(imageResponse.getFullName());
-        mData.add(imageResponse.getCompany());
-        mData.add(imageResponse.getEmail());
-    }
 
 }
