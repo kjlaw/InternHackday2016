@@ -81,6 +81,9 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
 
+        mCurrentHeadline = currentHeadline;
+        mCurrentName = currentName;
+
         mFacePositionPaint = new Paint();
         mFacePositionPaint.setColor(selectedColor);
 
