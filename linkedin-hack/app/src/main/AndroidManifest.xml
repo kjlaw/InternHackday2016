@@ -16,7 +16,7 @@
         android:name="android.support.multidex.MultiDexApplication">
         <activity
             android:name=".FaceTrackerActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

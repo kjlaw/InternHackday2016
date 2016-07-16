@@ -36,7 +36,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
     private static final int NUM_TEXT_LINES = 3;
     private static final float TEXT_PADDING = 60;
-    private static final int MAX_TEXT_SIZE = 100;
+    private static final int MAX_TEXT_SIZE = 70;
     private static final float FACE_POSITION_RADIUS = 10.0f;
     private static final float ID_TEXT_SIZE = 40.0f;
     private static final float ID_Y_OFFSET = 50.0f;
@@ -94,6 +94,10 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
     void setId(int id) {
         mFaceId = id;
+    }
+
+    int getId() {
+        return mFaceId;
     }
 
 

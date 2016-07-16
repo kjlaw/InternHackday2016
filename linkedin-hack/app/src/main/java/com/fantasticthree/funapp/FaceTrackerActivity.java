@@ -86,6 +86,9 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     public static String mCurrentName = "";
     public static String mCurrentHeadline = "";
 
+    private volatile boolean mIsNew;
+    private volatile long mLastCalledTimeMs;
+
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 2;
@@ -350,7 +353,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
-        private long mLastCalledTimeMs;
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
@@ -363,6 +365,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
+            mIsNew = true;
         }
 
         /**
@@ -373,7 +376,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
 
-            if (mPresenter.shouldTakePhoto() && (System.currentTimeMillis() > mLastCalledTimeMs + 5000)) {
+            if (mPresenter.shouldTakePhoto() && (System.currentTimeMillis() > mLastCalledTimeMs + 5000) && mIsNew) {
                 Subscriber<String> subscriber = new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
@@ -452,6 +455,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 mCurrentHeadline = userProfileEntity.getHeadLine();
                 mClickableText.setVisibility(View.VISIBLE);
                 mProgressBar.setVisibility(View.GONE);
+                mLastCalledTimeMs = System.currentTimeMillis();
+                mIsNew = false;
             }
 
             @Override
