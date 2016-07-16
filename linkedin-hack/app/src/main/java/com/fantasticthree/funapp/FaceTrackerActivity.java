@@ -23,8 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
@@ -184,10 +182,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         Context context = getApplicationContext();
         FaceDetector detector = new FaceDetector.Builder(context)
-                .setMode(FaceDetector.FAST_MODE)
+//                .setMode(FaceDetector.FAST_MODE)
 //                .setProminentFaceOnly(true)
-                .setLandmarkType(FaceDetector.NO_LANDMARKS)
-                .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
+//                .setLandmarkType(FaceDetector.NO_LANDMARKS)
+//                .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
