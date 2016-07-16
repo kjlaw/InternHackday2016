@@ -34,6 +34,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.fantasticthree.funapp.entity.UserProfileEntity;
@@ -80,6 +81,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private MainPresenter mPresenter;
     private ImageView mImageView;
     private TextView mClickableText;
+    private ProgressBar mProgressBar;
     private String mCurrentUuid = "";
     public static String mCurrentName = "";
     public static String mCurrentHeadline = "";
@@ -105,6 +107,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.image);
 
         mClickableText = (TextView) findViewById(R.id.clickable_text);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         if(mClickableText != null) {
             mClickableText.setOnClickListener(new View.OnClickListener() {
@@ -385,6 +388,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                     @Override
                     public void onNext(String encodedImage) {
                         mLastCalledTimeMs = System.currentTimeMillis();
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        mClickableText.setVisibility(View.GONE);
                         mPresenter.upload(encodedImage);
                     }
                 };
@@ -446,6 +451,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 mCurrentName = userProfileEntity.getName();
                 mCurrentHeadline = userProfileEntity.getHeadLine();
                 mClickableText.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.GONE);
             }
 
             @Override

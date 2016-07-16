@@ -19,14 +19,27 @@
 
     </com.fantasticthree.funapp.ui.camera.CameraSourcePreview>
 
-    <TextView
-        android:id="@+id/clickable_text"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="LinkedIn User Profile"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_weight="5" />
+        android:layout_weight="5" >
+
+        <TextView
+            android:id="@+id/clickable_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="LinkedIn User Profile"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
 
 </LinearLayout>
