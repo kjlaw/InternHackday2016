@@ -1,5 +1,6 @@
 package com.fantasticthree.funapp;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.fantasticthree.funapp.utils.RxUtils;
@@ -11,10 +12,11 @@ public class MainPresenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
 
     private Subscription mTestApiSubscription;
+    private Subscription mGetUserProfileSubscription;
     private final MainInteractor mMainInteractor;
 
-    public MainPresenter() {
-        mMainInteractor = new MainInteractor();
+    public MainPresenter(Context context) {
+        mMainInteractor = new MainInteractor(context);
         getTestApi();
     }
 
@@ -26,6 +28,17 @@ public class MainPresenter {
                     Log.d(TAG, s);
                 }, throwable -> {
                     Log.d(TAG, "Got an error: ", throwable);
+                });
+    }
+
+    public void getUserProfile(String userId) {
+        mGetUserProfileSubscription = mMainInteractor.getUserProfile(userId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userProfile -> {
+                    Log.d(TAG, "Received User Profile");
+                }, throwable -> {
+                    Log.e(TAG, "Received Error while getting user profile", throwable);
                 });
     }
 

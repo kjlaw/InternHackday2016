@@ -23,12 +23,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
@@ -40,9 +43,13 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.linkedin.platform.APIHelper;
 import com.linkedin.platform.AccessToken;
 import com.linkedin.platform.LISessionManager;
+import com.linkedin.platform.errors.LIApiError;
 import com.linkedin.platform.errors.LIAuthError;
+import com.linkedin.platform.listeners.ApiListener;
+import com.linkedin.platform.listeners.ApiResponse;
 import com.linkedin.platform.listeners.AuthListener;
 import com.linkedin.platform.utils.Scope;
 
@@ -61,6 +68,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private MainPresenter mPresenter;
+    private TextView mClickableText;
+    private String mCurrentUser = "blakebrown1995";
 
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -80,6 +89,18 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        mClickableText = (TextView) findViewById(R.id.clickable_text);
+
+        if(mClickableText != null) {
+            mClickableText.setOnClickListener(v -> {
+                mPresenter.getUserProfile("blakebrown1995");
+//                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//                builder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
+//                CustomTabsIntent customTabsIntent = builder.build();
+//                customTabsIntent.launchUrl(FaceTrackerActivity.this, Uri.parse(mCurrentUrl));
+//                Log.d(TAG, "Clicked Text View");
+            });
+        }
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -90,7 +111,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             requestCameraPermission();
         }
 
-        mPresenter = new MainPresenter();
+        mPresenter = new MainPresenter(FaceTrackerActivity.this);
     }
 
     @Override
