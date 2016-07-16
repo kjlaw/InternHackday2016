@@ -32,6 +32,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -83,6 +84,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private TextView mClickableText;
     private ProgressBar mProgressBar;
     private String mCurrentUuid = "";
+    private FrameLayout mFrameLayout;
     public static String mCurrentName = "";
     public static String mCurrentHeadline = "";
 
@@ -111,6 +113,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         mClickableText = (TextView) findViewById(R.id.clickable_text);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mFrameLayout = (FrameLayout) findViewById(R.id.frame_layout_pressable);
 
         if(mClickableText != null) {
             mClickableText.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +129,14 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             });
         }
 
+        mFrameLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mProgressBar.setVisibility(View.GONE);
+                mClickableText.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
