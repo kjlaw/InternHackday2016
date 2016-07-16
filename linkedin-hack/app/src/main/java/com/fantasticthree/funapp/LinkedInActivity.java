@@ -14,12 +14,14 @@ import com.linkedin.platform.utils.Scope;
 
 public class LinkedInActivity extends AppCompatActivity {
     private final static String TAG = LinkedInActivity.class.getSimpleName();
+    public static final int LOGIN_SUCCESSFUL_RESULT = 98463;
 
-    public static void launchActivity(final Activity activity) {
+    public static void launchActivityForResult(final Activity activity, int requestCode) {
         Intent launchIntent = new Intent(activity, LinkedInActivity.class);
         launchIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        activity.startActivity(launchIntent);
+        activity.startActivityForResult(launchIntent, requestCode);
     }
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class LinkedInActivity extends AppCompatActivity {
             @Override
             public void onAuthSuccess() {
                 Log.d(TAG, "Login Success");
+                setResult(LOGIN_SUCCESSFUL_RESULT);
                 finish();
             }
 
@@ -37,7 +40,7 @@ public class LinkedInActivity extends AppCompatActivity {
                 Log.d(TAG, "Authentication Error");
             }
         };
-        Scope scope = Scope.build(Scope.R_FULLPROFILE);
+        Scope scope = Scope.build(Scope.R_BASICPROFILE, Scope.W_SHARE);
         LISessionManager.getInstance(LinkedInActivity.this).init(LinkedInActivity.this, scope, authListener, false);
     }
 

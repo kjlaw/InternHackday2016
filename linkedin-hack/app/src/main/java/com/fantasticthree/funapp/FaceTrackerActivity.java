@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,7 @@ import android.view.View;
 
 import com.fantasticthree.funapp.ui.camera.CameraSourcePreview;
 import com.fantasticthree.funapp.ui.camera.GraphicOverlay;
+import com.fantasticthree.funapp.utils.ActivityRequestCodeGenerator;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -52,6 +54,7 @@ import java.io.IOException;
  */
 public final class FaceTrackerActivity extends AppCompatActivity {
     private static final String TAG = FaceTrackerActivity.class.getSimpleName();
+    private static final int LOGIN_ACTIVITY_REQUEST_CODE = ActivityRequestCodeGenerator.next();
 
     private CameraSource mCameraSource = null;
 
@@ -90,6 +93,13 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mPresenter = new MainPresenter();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == LOGIN_ACTIVITY_REQUEST_CODE && resultCode == LinkedInActivity.LOGIN_SUCCESSFUL_RESULT) {
+            startCameraSource();
+        }
+    }
 
     /**
      * Handles the requesting of the camera permission.  This includes
@@ -167,7 +177,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         if(LISessionManager.getInstance(this).getSession().isValid()) {
             startCameraSource();
         } else {
-            LinkedInActivity.launchActivity(this);
+            LinkedInActivity.launchActivityForResult(this, LOGIN_ACTIVITY_REQUEST_CODE);
         }
     }
 
