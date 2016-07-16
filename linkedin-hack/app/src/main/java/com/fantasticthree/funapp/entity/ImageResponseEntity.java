@@ -5,7 +5,7 @@ public class ImageResponseEntity {
     String name;
     String company;
     String email;
-    boolean isSuccessful;
+    boolean found;
 
     public String getUserId() {
         return userId;
@@ -24,6 +24,6 @@ public class ImageResponseEntity {
     }
 
     public boolean isSuccessful(){
-        return isSuccessful;
+        return found;
     }
 }

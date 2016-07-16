@@ -11,6 +11,7 @@ public class MainPresenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
 
     private Subscription mTestApiSubscription;
+    private Subscription mUploadSubscription;
     private final MainInteractor mMainInteractor;
 
     public MainPresenter() {
@@ -29,8 +30,28 @@ public class MainPresenter {
                 });
     }
 
+    public void upload(String encodedImage) {
+        if (mMainInteractor.isSending()) {
+            return;
+        }
+        mUploadSubscription = mMainInteractor.uploadImage(encodedImage)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(imageResponse -> {
+                    if (imageResponse == null) {
+                        Log.d(TAG, "imageResponse is null");
+                        return;
+                    }
+                    // TODO display text
+                    Log.d(TAG, "imageResponse: " + imageResponse.getFullName());
+                }, throwable -> {
+                    Log.d(TAG, "Got an error: ", throwable);
+                });
+    }
+
     public void onDestroy() {
         RxUtils.unsubscribe(mTestApiSubscription);
+        RxUtils.unsubscribe(mUploadSubscription);
     }
 
 }

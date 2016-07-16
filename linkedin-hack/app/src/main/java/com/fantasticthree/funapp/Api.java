@@ -12,13 +12,13 @@ import rx.Observable;
 
 public interface Api {
 
-    String BODY_IMAGE_PARAM = "image";
+    String BODY_IMAGE_PARAM = "photo";
     //    @GET("test")
     //    Observable<TestEntity> testApi(@Query("fields") String fields);
 
     @GET("face")
     Observable<TestEntity> testApi();
 
-    @POST("upload")
+    @POST("recognize")
     Observable<ImageResponseEntity> uploadPicture(@Body Map<String, Object> params);
 }

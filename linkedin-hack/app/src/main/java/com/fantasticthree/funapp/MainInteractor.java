@@ -1,5 +1,7 @@
 package com.fantasticthree.funapp;
 
+import android.util.Log;
+
 import com.fantasticthree.funapp.data.ImageResponse;
 import com.fantasticthree.funapp.entity.ImageResponseEntity;
 import com.fantasticthree.funapp.entity.TestEntity;
@@ -17,9 +19,13 @@ import rx.Observable;
 
 public class MainInteractor {
 
-    private static final HttpUrl API_BASE_URL = HttpUrl.parse("http://www.blakelockbrown.com/");
+    private static final String TAG = "MainInteractor";
+
+    private static final HttpUrl API_BASE_URL = HttpUrl.parse("http://blakelockbrown.com/");
 
     private Api mApi;
+
+    private boolean mIsSending;
 
     public MainInteractor() {
         setupApi();
@@ -49,6 +55,9 @@ public class MainInteractor {
         Map<String, Object> params = new HashMap<>();
         params.put(Api.BODY_IMAGE_PARAM, encodedImage);
         return mApi.uploadPicture(params)
+                .doOnSubscribe(() -> setIsSending(true))
+                .doOnUnsubscribe(() -> setIsSending(false))
+                .doOnTerminate(() -> setIsSending(false))
                 .map(this::createImageResponse);
     }
 
@@ -66,5 +75,14 @@ public class MainInteractor {
                 .withUserid(imageResponseEntity.getUserId())
                 .withFullname(imageResponseEntity.getName())
                 .build();
+    }
+
+    private synchronized void setIsSending(boolean isSending) {
+        Log.d(TAG, "setIsSending=" + isSending);
+        mIsSending = isSending;
+    }
+
+    public boolean isSending() {
+        return mIsSending;
     }
 }
